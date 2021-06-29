@@ -76,12 +76,13 @@ public class SketchCanvas extends View {
                 mContext.getPackageName());
             File file = new File(filename, directory == null ? "" : directory);
             BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-            Bitmap bitmap = res == 0 ?
+            Bitmap bitmap = res == 0 ? 
                 BitmapFactory.decodeFile(file.toString(), bitmapOptions) :
                 BitmapFactory.decodeResource(mContext.getResources(), res);
             if(bitmap != null) {
                 backgroundURI = Uri.fromFile(file);
-              
+                mOriginalHeight = bitmap.getHeight();
+                mOriginalWidth = bitmap.getWidth();
 
                 ExifInterface exif = null;
                 try {
@@ -89,14 +90,10 @@ public class SketchCanvas extends View {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
                 int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
 
-                Bitmap newBitmap = rotateBitmap(bitmap, orientation);
-
-                mBackgroundImage = newBitmap;
-                mOriginalHeight = newBitmap.getHeight();
-                mOriginalWidth = newBitmap.getWidth();
+                bitmap = rotateBitmap(bitmap, orientation);
+                mBackgroundImage = bitmap;
                 mContentMode = mode;
 
                 invalidateCanvas(true);
